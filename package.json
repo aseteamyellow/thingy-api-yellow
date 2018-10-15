@@ -1,0 +1,25 @@
+{
+  "name": "thingy-api-yellow",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aseteamyellow/thingy-api-yellow.git"
+  },
+  "author": "Nicolas Fuchs",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/aseteamyellow/thingy-api-yellow/issues"
+  },
+  "homepage": "https://github.com/aseteamyellow/thingy-api-yellow#readme",
+  "dependencies": {
+    "@koa/cors": "^2.2.2",
+    "koa": "^2.5.3",
+    "koa-bodyparser": "^4.2.1",
+    "koa-router": "^7.4.0"
+  }
+}
