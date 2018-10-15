@@ -4,6 +4,10 @@ const Koa = require('koa');
 const bodyParser = require('koa-bodyparser');
 const cors = require('@koa/cors');
 
+const influx = require('influxdb-nodejs');
+const client = new influx('http://127.0.0.1:8086/thingy');
+console.log(client);
+
 const app = new Koa();
 
 // InfluxDB connection
