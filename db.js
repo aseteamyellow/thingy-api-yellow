@@ -10,14 +10,13 @@ async function createInfluxDBConnection(port) {
 
 // Creation of InfluxDB table (one per thingy)
 async function createTableInfluxDB(tableName) {
-    const name = tableName + 'Schema';
-    eval ('const ' + name + ' = {' +
-        'humidity: \'i\',' +
-        'temperature: \'i\',' +
-        'air_quality: \'i\',' +
-        'air_pressure: \'i\',' +
-        'acceleration: \'i\'};');
-    await connI.schema('http', eval(name), {stripUnknown: true});
+    await connI.schema(tableName, {
+        humidity: 'float',
+        temperature: 'float',
+        air_quality: 'integer',
+        air_pressure: 'float',
+        light: 'float'
+    });
 }
 
 // Deletion of InfluxDB table
@@ -28,7 +27,8 @@ async function deleteTableInfluxDB(tableName) {
 
 // Insertion of data into InfluxDB table
 async function insertInfluxDB(tableName, data) {
-    await eval('connI.write(\'http\').' + tableName + '(' + data + ')');
+    //await eval('connI.write(\'http\').' + tableName + '(' + data + ')');
+    await connI.write(tableName).field(data)
 }
 
 // Creation of MySQL connection + tables
@@ -55,12 +55,12 @@ async function createMySQLConnection(host, user, password) {
                                         'temperature INT,' +
                                         'air_quality INT UNSIGNED,' +
                                         'air_pressure INT UNSIGNED,' +
-                                        'acceleration INT UNSIGNED,' +
+                                        'light INT UNSIGNED,' +
                                         'humidity_notif BOOL DEFAULT false,' +
                                         'temperature_notif BOOL DEFAULT false,' +
                                         'air_quality_notif BOOL DEFAULT false,' +
                                         'air_pressure_notif BOOL DEFAULT false,' +
-                                        'acceleration_notif BOOL DEFAULT false,' +
+                                        'light_notif BOOL DEFAULT false,' +
                                         'thingy VARCHAR(100) NOT NULL,' +
                                         'FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE ON UPDATE CASCADE);';
     const animalTypeTableCreation =     'CREATE TABLE IF NOT EXISTS animalType (' +
@@ -85,8 +85,11 @@ async function createMySQLConnection(host, user, password) {
     }
 }
 
+const mqtt = require('./mqtt');
+
 // Insertion of data into MySQL table
 async function insertMySQL(tableName, data) {
+    if (tableName === 'environment') await createTableInfluxDB(data['thingy']);
     let columns = "";
     let values = "";
     for (const key in data) {
@@ -156,15 +159,6 @@ async function getAllAnimals(id) {
 async function getOneEnvironment(id) {
     const tableReading = 'SELECT * FROM environment WHERE id = ' + id;
     const animals = await getAllAnimals(id);
-    /*const tableReading =    'SELECT environment.id,environment.user_id,environment.name,' +
-                            'environment.env_type,environment.humidity,environment.temperature,' +
-                            'environment.air_quality,environment.air_pressure,environment.acceleration,' +
-                            'environment.humidity_notif,environment.temperature_notif,environment.air_quality_notif,' +
-                            'environment.air_pressure_notif,environment.acceleration_notif' +
-                            'animal.id,animal.name,animalType.type ' +
-                            'FROM animal JOIN animalType ON animal.animalType_id = animalType.id ' +
-                            'JOIN environment ON animal.environment_id = environment.id ' +
-                            'WHERE environment.id = ' + id;*/
     const res = await connM.query(tableReading).catch((err) => {return err;});
     if (res.length !== 0) {
         res[0]['animals'] = animals;
@@ -181,18 +175,14 @@ async function getAllEnvironments(id) {
     for (let i = 0; i < res.length; i++) {
         res[i]['animals'] = await getAllAnimals(res[i].id);
     }
-    /*const tableReading =    'SELECT environment.id,environment.user_id,environment.name,' +
-                            'environment.env_type,environment.humidity,environment.temperature,' +
-                            'environment.air_quality,environment.air_pressure,environment.acceleration,' +
-                            'environment.humidity_notif,environment.temperature_notif,environment.air_quality_notif,' +
-                            'environment.air_pressure_notif,environment.acceleration_notif,' +
-                            'animal.id,animal.name,animalType.type ' +
-                            'FROM animal JOIN animalType ON animal.animalType_id = animalType.id ' +
-                            'JOIN environment ON animal.environment_id = environment.id ' +
-                            'WHERE environment.user_id = ' + id;*/
     return res;
 }
 
+// Reading all notification settings of all thingys
+async function getNotifs() {
+    const tableReading = 'SELECT thingy, humidity_notif, temperature_notif, air_quality_notif, air_pressure_notif, light_notif FROM environment';
+    return await connM.query(tableReading).catch((err) => {return err;});
+}
 
 module.exports.createInfluxDBConnection = createInfluxDBConnection;
 module.exports.createTableInfluxDB = createTableInfluxDB;
@@ -208,3 +198,4 @@ module.exports.getOneAnimal = getOneAnimal;
 module.exports.getAllAnimals = getAllAnimals;
 module.exports.getOneEnvironment = getOneEnvironment;
 module.exports.getAllEnvironments = getAllEnvironments;
+module.exports.getNotifs = getNotifs;

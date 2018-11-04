@@ -12,8 +12,6 @@ const mqtt = require('./mqtt');
 db.createInfluxDBConnection(8086);
 db.createMySQLConnection('localhost','root','');
 
-//mqtt.changeSubscriptions(null, null, true);
-
 app
     .use(bodyParser())
     .use(cors());
