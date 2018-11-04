@@ -1,56 +1,28 @@
-const router = require('koa-router')();
-
 const Koa = require('koa');
 const bodyParser = require('koa-bodyparser');
 const cors = require('@koa/cors');
-
-const influx = require('influxdb-nodejs');
-const client = new influx('http://127.0.0.1:8086/thingy');
-console.log(client);
-
 const app = new Koa();
 
-// InfluxDB connection
-let connection;
-(async() => {
+const animal = require('./routes/animal');
+const account = require('./routes/account');
+const environment = require('./routes/environment');
+const db = require('./db');
+const mqtt = require('./mqtt');
 
-})();
+db.createInfluxDBConnection(8086);
+db.createMySQLConnection('localhost','root','');
 
-// Routes
-router
-    .del('/account/:accountId',)
-    .post('/account/create',)
-    .post('/account/connect')
-    .patch('/account/:accountId',);
-
-// Gets
-async function getFunction(ctx) {
-
-    ctx.status = 200;
-    ctx.body = {};
-}
-
-// Deletes
-async function deleteFunction(ctx) {
-    const deleteQuery = '';
-    await connection.query(deleteQuery).catch((err) => console.log(err));
-    ctx.status = 200;
-    ctx.body = '';
-}
-
-// Creates
-async function createFunction(ctx) {
-    const todo = ctx.request.body;
-    const insertQuery = '';
-    const res = await connection.query(insertQuery).catch((err) => console.log(err));
-    ctx.status = 303;
-    ctx.set('Location', 'url' + res.insertId);
-}
+//mqtt.changeSubscriptions(null, null, true);
 
 app
     .use(bodyParser())
-    .use(cors())
-    .use(router.routes())
-    .use(router.allowedMethods());
+    .use(cors());
+
+app.use(animal.routes());
+app.use(animal.allowedMethods());
+app.use(account.routes());
+app.use(account.allowedMethods());
+app.use(environment.routes());
+app.use(environment.allowedMethods());
 
 app.listen(8080);

@@ -18,9 +18,12 @@
   "homepage": "https://github.com/aseteamyellow/thingy-api-yellow#readme",
   "dependencies": {
     "@koa/cors": "^2.2.2",
+    "async-mysql": "^1.0.1",
     "influxdb-nodejs": "^2.9.0",
     "koa": "^2.5.3",
+    "koa-body": "^4.0.4",
     "koa-bodyparser": "^4.2.1",
-    "koa-router": "^7.4.0"
+    "koa-router": "^7.4.0",
+    "mqtt": "^2.18.8"
   }
 }
