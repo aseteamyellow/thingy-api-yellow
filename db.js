@@ -13,7 +13,7 @@ async function createTableInfluxDB(tableName) {
     await connI.schema(tableName, {
         humidity: 'float',
         temperature: 'float',
-        air_quality: 'integer',
+        air_quality: 'float',
         air_pressure: 'float',
         light: 'float'
     });
@@ -21,8 +21,8 @@ async function createTableInfluxDB(tableName) {
 
 // Deletion of InfluxDB table
 async function deleteTableInfluxDB(tableName) {
-    const name = tableName + 'Schema';
     // TODO
+
 }
 
 // Insertion of data into InfluxDB table
@@ -89,11 +89,24 @@ async function createMySQLConnection(host, user, password) {
     }
 }
 
+const ts = require('./thingyServicesUUID');
 const mqtt = require('./mqtt');
+
+// Changement of the subscriptions
+async function changeSubscriptions(thingyId, data) {
+    let subs = {};
+    for (const key in data) {
+        if (data.hasOwnProperty(key) && ts.hasOwnProperty(key.toUpperCase())) subs[key] = data[key];
+    }
+    await mqtt.changeSubscriptions(thingyId, subs);
+}
 
 // Insertion of data into MySQL table
 async function insertMySQL(tableName, data) {
-    if (tableName === 'environment') await createTableInfluxDB(data['thingy']);
+    if (tableName === 'environment') {
+        await createTableInfluxDB(data['thingy']);
+        await changeSubscriptions(data['thingy'], data);
+    }
     let columns = "";
     let values = "";
     for (const key in data) {
@@ -111,9 +124,30 @@ async function insertMySQL(tableName, data) {
 
 // Modification of data in MySQL table
 async function updateMySQL(tableName, data, id) {
+    if (tableName === 'environment') {
+        const getEnvironment = 'SELECT * FROM environment WHERE id = ' + id;
+        const environment = await connM.query(getEnvironment).catch((err) => console.log(err));
+        if (data.hasOwnProperty('thingy')) {
+            await changeSubscriptions(environment['thingy'], {
+                temperature_notif: false,
+                air_pressure_notif: false,
+                humidity_notif: false,
+                air_quality_notif: false,
+                light_notif: false
+            });
+            for (const key in data) {
+                if (data.hasOwnProperty(key) && ts.hasOwnProperty(key.toUpperCase())) environment[key] = data[key];
+            }
+            await changeSubscriptions(data['thingy'], environment);
+        } else {
+            await changeSubscriptions(environment['thingy'], data);
+        }
+    }
     let tableModification = 'UPDATE ' + tableName + ' SET ';
     for (const key in data) {
-        if (data.hasOwnProperty(key)) tableModification += key + " = '" + data[key] + "',";
+        if (data.hasOwnProperty(key)) //tableModification += key + " = '" + data[key] + "',";
+            if (key.endsWith('notif')) tableModification += key + " = " + data[key] + ",";
+            else tableModification += key + " = '" + data[key] + "',";
     }
     tableModification = tableModification.substring(0, tableModification.length-1) + " WHERE id = " + id;
     return await connM.query(tableModification).catch((err) => {return err;});
@@ -121,6 +155,18 @@ async function updateMySQL(tableName, data, id) {
 
 // Deletion of data from MySQL table
 async function deleteMySQL(tableName, id) {
+    if (tableName === 'environment') {
+        const getThingyId = 'SELECT * FROM environment WHERE id = ' + id;
+        const thingyId = await connM.query(getThingyId).catch((err) => console.log(err));
+        await changeSubscriptions(thingyId, {
+            temperature_notif: false,
+            air_pressure_notif: false,
+            humidity_notif: false,
+            air_quality_notif: false,
+            light_notif: false
+        });
+        // Call influxdb table deletion
+    }
     const tableDeletion = 'DELETE FROM ' + tableName + ' WHERE id = ' + id;
     const res = await connM.query(tableDeletion).catch((err) => {return err;});
     if (res.affectedRows === 0) {

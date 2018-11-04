@@ -28,20 +28,30 @@ client.on('connect', function () {
     })
 });
 
-let data = {};
+let datas = {};
+let topics = {};
 client.on('message', function (topic, message) {
+    const thingyId = topic.split('/')[0];
+    if (topics.hasOwnProperty(thingyId) && topics[thingyId].includes(topic)) {
+        db.insertInfluxDB(topic.split('/')[0], datas[thingyId]).catch((err) => console.log(err));
+        datas[thingyId] = {};
+        topics[thingyId] = [];
+    }
+    if (!datas.hasOwnProperty(thingyId)) {
+        datas[thingyId] = {};
+        topics[thingyId] = [];
+    }
     switch(message.length) {
-        case 1 : data.humidity = message.readUInt8(0); break;
-        case 2 : data.temperature = message.readInt8(0) + (message.readUInt8(1)/100); break;
-        case 4 : data.air_quality = message.readUInt16LE(0); break;
-        case 5 : data.air_pressure = message.readInt32LE(0) + (message.readUInt8(4)/100); break;
-        case 8 : data.light = message.readUInt16LE(0) + message.readUInt16LE(2) + message.readUInt16LE(4) + message.readUInt16LE(6);   //It shouldn't be plus (red, green, blue, clear)
+        case 1 : datas[thingyId].humidity = message.readUInt8(0); break;
+        case 2 : datas[thingyId].temperature = message.readInt8(0) + (message.readUInt8(1)/100); break;
+        case 4 : datas[thingyId].air_quality = message.readUInt16LE(0); break;
+        case 5 : datas[thingyId].air_pressure = message.readInt32LE(0) + (message.readUInt8(4)/100); break;
+        case 8 : datas[thingyId].light = message.readUInt16LE(0) + message.readUInt16LE(2) + message.readUInt16LE(4) + message.readUInt16LE(6);   //It shouldn't be plus (red, green, blue, clear)
     }
-    console.log(topic + ' ' + Object.keys(data).length);
-    if (Object.keys(data).length === 5) {
-        db.insertInfluxDB(topic.split('/')[0], data).catch((err) => console.log(err));
-        data = {};
-    }
+    topics[thingyId].push(topic);
+    console.log(topic + ' ' + Object.keys(datas[thingyId]).length);
+    //if (Object.keys(data).length === 5) {
+
 });
 
 const ts = require('./thingyServicesUUID');
@@ -52,7 +62,6 @@ async function initSubscriptions() {
     const subs = await db.getNotifs();
     for (let i = 0; i < subs.length; i++) {
         const thingy = subs[i].thingy; delete subs[i].thingy;
-        //await db.createTableInfluxDB(thingy).catch((err) => console.log(err));
         await changeSubscriptions(thingy, subs[i]);
     }
 }
@@ -65,7 +74,7 @@ async function changeSubscriptions(thingyUUID, topics) {
         const topicUUID = key.toUpperCase();
         if (ts.hasOwnProperty(topicUUID)) {
             const completeTopicUUID = thingyUUID + '/' + replaceCharAt(ts[topicUUID], 0, 7) + '/' + ts[topicUUID];
-            if (topics[key] === 1) topicsToSubscribe = topicsToSubscribe.concat([completeTopicUUID]);
+            if (topics[key] === 1 || topics[key]) topicsToSubscribe = topicsToSubscribe.concat([completeTopicUUID]);
             else topicsToUnsubscribe = topicsToUnsubscribe.concat([completeTopicUUID]);
         }
     }
