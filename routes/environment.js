@@ -3,6 +3,7 @@ const router = require('koa-router')({ prefix: '/environment' });
 router
     .get('/all/:userId', getAllEnvironments)
     .get('/one/:envId', getOneEnvironment)
+    .get('/sensors/:thingyId', getSensorsData)
     .post('/:userId', createEnvironment)
     .patch('/:envId', updateEnvironment)
     .delete('/:envId', deleteEnvironment);
@@ -31,6 +32,13 @@ async function getOneEnvironment(ctx) {
         ctx.status = 200;
         ctx.body = res;
     }
+}
+
+// Gets sensors data of a thingy
+async function getSensorsData(ctx) {
+    const res = await db.getSensorsData(ctx.params.thingyId);
+    ctx.status = 200;
+    ctx.body = res.results[0].series[0];
 }
 
 // Creates an environment

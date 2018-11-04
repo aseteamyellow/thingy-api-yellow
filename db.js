@@ -6,8 +6,6 @@ async function createInfluxDBConnection(port) {
     const influx = require('influxdb-nodejs');
     connI = new influx('http://127.0.0.1:' + port + '/thingy');
     connI.createDatabase().catch((err) => console.log(err));
-    const res = await getSensorsData('jna4PM6ONSWNeQmtf62oBA').catch((err) => console.log(err));
-    console.log(res.results[0].series[0]);
 }
 
 // Creation of InfluxDB table (one per thingy)
@@ -29,8 +27,7 @@ async function deleteTableInfluxDB(tableName) {
 
 // Insertion of data into InfluxDB table
 async function insertInfluxDB(tableName, data) {
-    //await eval('connI.write(\'http\').' + tableName + '(' + data + ')');
-    await connI.write(tableName).field(data)
+    await connI.write(tableName).field(data);
 }
 
 // Reading of sensors data of a thingy
@@ -195,6 +192,7 @@ module.exports.createInfluxDBConnection = createInfluxDBConnection;
 module.exports.createTableInfluxDB = createTableInfluxDB;
 module.exports.deleteTableInfluxDB = deleteTableInfluxDB;
 module.exports.insertInfluxDB = insertInfluxDB;
+module.exports.getSensorsData = getSensorsData;
 
 module.exports.createMySQLConnection = createMySQLConnection;
 module.exports.insertMySQL = insertMySQL;
