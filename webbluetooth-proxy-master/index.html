@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang=en>
+<head>
+    <meta charset=utf-8>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimal-ui">
+    <title>Web Bluetooth Proxy</title>
+    <link rel="icon" type="image/png" href="//bluetooth.com/~/media/images/bticon.ashx">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/3.0.3/normalize.css">
+    <link rel="stylesheet" href="//cdn.rawgit.com/milligram/milligram/master/dist/milligram.min.css">
+    <link rel="stylesheet" href="styles/milligram-theme.css">
+    <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+<nav class="navigation">
+    <section class="container">
+        <a class="navigation-title" href="#"><h1 class="title">Web Bluetooth Proxy</h1></a>
+        <input type="button" id="connect-modal" class="button-large" value="Connect">
+    </section>
+</nav>
+<header class="header">
+    <section class="container">
+        <h1>Web Bluetooth Proxy</h1>
+        <button type="button" id="ble-scan" class="button-large">Pair</button>
+        <dialog id="connect-dialog">
+            <form id="connect-form" method="dialog">
+                <section>
+                    <p><label for="broker-url">Broker address :</label>
+                        <input type="text" placeholder="ws://mqtt.thing.zone" id="broker-url">
+                        <label for="mqttUsername">Login :</label>
+                        <input type="text" placeholder="Username" id="username" name="username">
+                        <input type="password" placeholder="Password" id="password" name="password">
+                        <input type="checkbox" id="anonymous"> anonymous</p>
+                </section>
+                <span class="error" aria-live="polite"></span>
+                <menu>
+                    <button id="cancel" type="reset">Cancel</button>
+                    <button id="connect" type="submit">Connect</button>
+                </menu>
+            </form>
+        </dialog>
+    </section>
+</header>
+<section id="device-grid" class="container">
+</section>
+<section class="container">
+    <p>Coded with ♥ by<a href="http://github.com/DurandA" title="Arnaud Durand" target="_blank"> Arnaud Durand</a>.
+    </p>
+    <p>Modified with ♥ by<a href="http://github.com/NicolasFuchs" title="Nicolas Fuchs" target="_blank"> Nicolas Fuchs</a>.
+    </p>
+</section>
+<script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+<script src="https://unpkg.com/js-base64/base64.min.js"></script>
+<script src="js/buffer.min.js"></script>
+<script src="js/app.js"></script>
+<script src="https://unpkg.com/ionicons@4.2.0/dist/ionicons.js"></script>
+</body>
+</html>
