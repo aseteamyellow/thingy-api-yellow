@@ -11,7 +11,9 @@ const mqtt = require('./mqtt');
 
 db.createInfluxDBConnection(8086);
 //db.createMySQLConnection('localhost','root','');
-db.createMySQLConnection('localhost','root','').then(db.insertTestingDataInMySQLTables).catch((err) => console.log(err));
+db.createMySQLConnection('localhost','root','')
+    .then(db.insertTestingDataInMySQLTables)
+    .then(db.insertTestingDataInInfluxDBTables).catch((err) => console.log(err));
 
 app
     .use(bodyParser())

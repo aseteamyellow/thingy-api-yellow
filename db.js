@@ -103,7 +103,7 @@ async function insertTestingDataInMySQLTables() {
                                                 "(NULL,'delia.favre@unifr.ch','PasswordOfDelia')," +
                                                 "(NULL,'maeva.vulliens@unifr.ch','PasswordOfMaeva')," +
                                                 "(NULL,'tania.chenaux@unifr.ch','PasswordOfTania');";
-    const insertEnvironments = "INSERT INTO environment VALUES (NULL,'1','NicoAquarium','aquarium','0.77','0.79','37','39','149','151','1010','1015',NULL,NULL,true,true,true,true,false,'172.22.22.192:8080','ThingyY1')," +
+    const insertEnvironments = "INSERT INTO environment VALUES (NULL,'1','NicoAquarium','aquarium','0.77','0.79','37','39','149','151','1010','1015','0','255255255',true,true,true,true,true,'172.22.22.192:8080','ThingyY1')," +
                                                               "(NULL,'3','DeliaTerrarium','terrarium',NULL,NULL,'37','39','149','151','1010','1015',NULL,NULL,false,true,true,true,false,NULL,'Yellow');";
     const insertAnimals = "INSERT INTO animal VALUES (NULL,'riri',1,15)," +
                                                     "(NULL,'fifi',1,11)," +
@@ -114,8 +114,35 @@ async function insertTestingDataInMySQLTables() {
 }
 
 // Insertion of testing data into influxDB tables
-async function insertTestingDataInInfluxDBTable() {
-    //data
+async function insertTestingDataInInfluxDBTables() {
+    let sensorsData1 = [
+        {"air_quality":1444,"temperature":26.98,"humidity":43,"air_pressure":919.41},
+        {"air_quality":567,"temperature":27.66,"air_pressure":918.83},
+        {"air_quality":1444,"temperature":26.99,"humidity":44,"air_pressure":919.37},
+        {"air_quality":560,"temperature":28.07,"air_pressure":918.84},
+        {"air_quality":1444,"temperature":26.85,"humidity":44,"air_pressure":919.45},
+        {"air_quality":560,"temperature":26.83,"air_pressure":918.72},
+        {"air_quality":1428,"temperature":26.99,"humidity":43,"air_pressure":919.43},
+        {"air_quality":567,"temperature":27.68,"air_pressure":918.93},
+        {"air_quality":1444,"temperature":27.14,"humidity":44,"air_pressure":919.36},
+        {"air_quality":553,"temperature":27.64,"air_pressure":918.86}
+    ];
+    let sensorsData2 = [
+        {"air_quality":1444,"temperature":26.92,"humidity":44,"air_pressure":919.35},
+        {"air_quality":560,"temperature":28.27,"air_pressure":918.85},
+        {"air_quality":1444,"temperature":26.92,"humidity":44,"air_pressure":919.32},
+        {"air_quality":567,"temperature":27.66,"air_pressure":918.74},
+        {"air_quality":1472,"temperature":26.9,"humidity":43,"air_pressure":919.37},
+        {"air_quality":560,"temperature":27,"air_pressure":918.84},
+        {"temperature":27.26,"light":23278,"humidity":42,"air_pressure":919.31,"air_quality":1736},
+        {"temperature":27.24,"light":23287,"humidity":43,"air_pressure":919.28,"air_quality":1736},
+        {"temperature":27.3,"light":23287,"humidity":42,"air_pressure":919.29,"air_quality":1736},
+        {"temperature":27.39,"light":23280,"humidity":42,"air_pressure":919.33,"air_quality":1736}
+    ];
+    for (let i = 0; i < sensorsData1.length; i++) {
+        await insertInfluxDB('Yellow', sensorsData1[i]);
+        await insertInfluxDB('ThingyY1', sensorsData2[i]);
+    }
 }
 
 const mqtt = require('./mqtt');
@@ -239,8 +266,10 @@ module.exports.deleteTableInfluxDB = deleteTableInfluxDB;
 module.exports.insertInfluxDB = insertInfluxDB;
 module.exports.getSensorsData = getSensorsData;
 
-module.exports.createMySQLConnection = createMySQLConnection;
+module.exports.insertTestingDataInInfluxDBTables = insertTestingDataInInfluxDBTables;
 module.exports.insertTestingDataInMySQLTables = insertTestingDataInMySQLTables;
+
+module.exports.createMySQLConnection = createMySQLConnection;
 module.exports.insertMySQL = insertMySQL;
 module.exports.updateMySQL = updateMySQL;
 module.exports.deleteMySQL = deleteMySQL;
