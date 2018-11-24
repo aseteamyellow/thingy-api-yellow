@@ -13,7 +13,7 @@ async function createTableInfluxDB(tableName) {
     await connI.schema(tableName, {
         humidity: 'float',
         temperature: 'float',
-        air_quality: 'integer',
+        air_quality: 'float',
         air_pressure: 'float',
         light: 'float'
     });
@@ -21,8 +21,7 @@ async function createTableInfluxDB(tableName) {
 
 // Deletion of InfluxDB table
 async function deleteTableInfluxDB(tableName) {
-    const name = tableName + 'Schema';
-    // TODO
+    await connI.query('DROP SERIES FROM ' + tableName);
 }
 
 // Insertion of data into InfluxDB table
@@ -54,17 +53,23 @@ async function createMySQLConnection(host, user, password) {
                                         'id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,' +
                                         'user_id INT UNSIGNED NOT NULL,' +
                                         'name VARCHAR(100) NOT NULL,' +
-                                        'env_type ENUM(\'terrarium\', \'aquarium\', \'aquaterrarium\'),' +
-                                        'humidity INT UNSIGNED,' +
-                                        'temperature INT,' +
-                                        'air_quality INT UNSIGNED,' +
-                                        'air_pressure INT UNSIGNED,' +
-                                        'light INT UNSIGNED,' +
+                                        'env_type ENUM(\'terrarium\', \'aquarium\', \'aquaterrarium\') NOT NULL,' +
+                                        'humidity_min DECIMAL(15,5),' +
+                                        'humidity_max DECIMAL(15,5),' +
+                                        'temperature_min DECIMAL(15,5),' +
+                                        'temperature_max DECIMAL(15,5),' +
+                                        'air_quality_min DECIMAL(15,5),' +
+                                        'air_quality_max DECIMAL(15,5),' +
+                                        'air_pressure_min DECIMAL(15,5),' +
+                                        'air_pressure_max DECIMAL(15,5),' +
+                                        'light_min DECIMAL(15,5),' +
+                                        'light_max DECIMAL(15,5),' +
                                         'humidity_notif BOOL DEFAULT false,' +
                                         'temperature_notif BOOL DEFAULT false,' +
                                         'air_quality_notif BOOL DEFAULT false,' +
                                         'air_pressure_notif BOOL DEFAULT false,' +
                                         'light_notif BOOL DEFAULT false,' +
+                                        'pi_camera VARCHAR(100),' +
                                         'thingy VARCHAR(100) NOT NULL,' +
                                         'FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE ON UPDATE CASCADE);';
     const animalTypeTableCreation =     'CREATE TABLE IF NOT EXISTS animalType (' +
@@ -89,11 +94,38 @@ async function createMySQLConnection(host, user, password) {
     }
 }
 
+// Insertion of testing data into MysQL tables
+async function insertTestingDataInMySQLTables() {
+    const deleteAllTablesContent = "DELETE FROM animal; DELETE FROM environment; DELETE FROM user;";
+    const resetAllIncrements = "ALTER TABLE animal AUTO_INCREMENT = 1; ALTER TABLE environment AUTO_INCREMENT = 1; ALTER TABLE user AUTO_INCREMENT = 1;";
+    const insertUsers = "INSERT INTO user VALUES (NULL,'nicolas.fuchs@unifr.ch','PasswordOfNicolas')," +
+                                                "(NULL,'sylvain.julmy@unifr.ch','PasswordOfSylvain')," +
+                                                "(NULL,'delia.favre@unifr.ch','PasswordOfDelia')," +
+                                                "(NULL,'maeva.vulliens@unifr.ch','PasswordOfMaeva')," +
+                                                "(NULL,'tania.chenaux@unifr.ch','PasswordOfTania');";
+    const insertEnvironments = "INSERT INTO environment VALUES (NULL,'1','NicoAquarium','aquarium','0.77','0.79','37','39','149','151','1010','1015',NULL,NULL,true,true,true,true,false,'172.22.22.192:8080','ThingyY1')," +
+                                                              "(NULL,'3','DeliaTerrarium','terrarium',NULL,NULL,'37','39','149','151','1010','1015',NULL,NULL,false,true,true,true,false,NULL,'Yellow');";
+    const insertAnimals = "INSERT INTO animal VALUES (NULL,'riri',1,15)," +
+                                                    "(NULL,'fifi',1,11)," +
+                                                    "(NULL,'loulou',1,10)," +
+                                                    "(NULL,'donut',2,3)," +
+                                                    "(NULL,'capsule',2,5);";
+    connM.query(deleteAllTablesContent + resetAllIncrements + insertUsers + insertEnvironments + insertAnimals).catch((err) => console.log(err));
+}
+
+// Insertion of testing data into influxDB tables
+async function insertTestingDataInInfluxDBTable() {
+    //data
+}
+
 const mqtt = require('./mqtt');
 
 // Insertion of data into MySQL table
 async function insertMySQL(tableName, data) {
-    if (tableName === 'environment') await createTableInfluxDB(data['thingy']);
+    if (tableName === 'environment') {
+        await createTableInfluxDB(data['thingy']);
+        await mqtt.changeSubscriptions(data['thingy'], data);
+    }
     let columns = "";
     let values = "";
     for (const key in data) {
@@ -111,6 +143,13 @@ async function insertMySQL(tableName, data) {
 
 // Modification of data in MySQL table
 async function updateMySQL(tableName, data, id) {
+    if (tableName === 'environment') {
+        if (data.hasOwnProperty('thingy')) {
+            await deleteTableInfluxDB(data.thingy);
+            await mqtt.deleteAllSubscriptions(data.thingy);
+        }
+        await mqtt.changeSubscriptions(data['thingy'], data);
+    }
     let tableModification = 'UPDATE ' + tableName + ' SET ';
     for (const key in data) {
         if (data.hasOwnProperty(key)) tableModification += key + " = '" + data[key] + "',";
@@ -121,6 +160,12 @@ async function updateMySQL(tableName, data, id) {
 
 // Deletion of data from MySQL table
 async function deleteMySQL(tableName, id) {
+    if (tableName === 'environment') {
+        const tableReading = 'SELECT thingy FROM environment WHERE id = ' + id;
+        const res = await connM.query(tableReading).catch((err) => {return err;});
+        await  deleteTableInfluxDB(res[0].thingy);
+        await mqtt.deleteAllSubscriptions(res[0].thingy);
+    }
     const tableDeletion = 'DELETE FROM ' + tableName + ' WHERE id = ' + id;
     const res = await connM.query(tableDeletion).catch((err) => {return err;});
     if (res.affectedRows === 0) {
@@ -195,6 +240,7 @@ module.exports.insertInfluxDB = insertInfluxDB;
 module.exports.getSensorsData = getSensorsData;
 
 module.exports.createMySQLConnection = createMySQLConnection;
+module.exports.insertTestingDataInMySQLTables = insertTestingDataInMySQLTables;
 module.exports.insertMySQL = insertMySQL;
 module.exports.updateMySQL = updateMySQL;
 module.exports.deleteMySQL = deleteMySQL;
