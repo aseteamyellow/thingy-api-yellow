@@ -216,7 +216,8 @@ async function getOneUser(credentials) {
 
 // Reading of an animal
 async function getOneAnimal(id) {
-    const tableReading = 'SELECT animal.id, animal.name, animal.environment_id, animalType.type FROM animal JOIN animalType ON animal.animalType_id = animalType.id WHERE animal.id = ' + id;
+    //const tableReading = 'SELECT animal.id, animal.name, animal.environment_id, animalType.type FROM animal JOIN animalType ON animal.animalType_id = animalType.id WHERE animal.id = ' + id;
+    const tableReading = 'SELECT * FROM animal WHERE animal.id = ' + id;
     const res = await connM.query(tableReading).catch((err) => {return err;});
     if (res.length !== 0) {
         return res[0];
@@ -227,7 +228,14 @@ async function getOneAnimal(id) {
 
 // Reading all animals of an environment
 async function getAllAnimals(id) {
-    const tableReading = 'SELECT animal.id, animal.name, animalType.type FROM animal JOIN animalType ON animal.animalType_id = animalType.id WHERE animal.environment_id = ' + id;
+    //const tableReading = 'SELECT animal.id, animal.name, animalType.type FROM animal JOIN animalType ON animal.animalType_id = animalType.id WHERE animal.environment_id = ' + id;
+    const tableReading = 'SELECT animal.id, animal.name, animal.animalType_id FROM animals WHERE animal.environment_id = ' + id;
+    return await connM.query(tableReading).catch((err) => {return err;});
+}
+
+// Reading all animal types
+async function getAllAnimalTypes() {
+    const tableReading = 'SELECT * FROM animalType;';
     return await connM.query(tableReading).catch((err) => {return err;});
 }
 
@@ -276,6 +284,7 @@ module.exports.deleteMySQL = deleteMySQL;
 module.exports.getOneUser = getOneUser;
 module.exports.getOneAnimal = getOneAnimal;
 module.exports.getAllAnimals = getAllAnimals;
+module.exports.getAllAnimalTypes = getAllAnimalTypes;
 module.exports.getOneEnvironment = getOneEnvironment;
 module.exports.getAllEnvironments = getAllEnvironments;
 module.exports.getNotifs = getNotifs;
