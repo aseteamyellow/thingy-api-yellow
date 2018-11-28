@@ -4,7 +4,7 @@ let connM = null;
 // Creation of InfluxDB connection
 async function createInfluxDBConnection(port) {
     const influx = require('influxdb-nodejs');
-    connI = new influx('http://127.0.0.1:' + port + '/thingy');
+    connI = new influx('influxdb:' + port + '/thingy');
     connI.createDatabase().catch((err) => console.log(err));
 }
 
