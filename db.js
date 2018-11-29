@@ -4,7 +4,7 @@ let connM = null;
 // Creation of InfluxDB connection
 async function createInfluxDBConnection(port) {
     const influx = require('influxdb-nodejs');
-    connI = new influx('influxdb:' + port + '/thingy');
+    connI = new influx('http://influxdb:' + port + '/thingy');
     connI.createDatabase().catch((err) => console.log(err));
 }
 
@@ -38,7 +38,7 @@ async function getSensorsData(thingyId) {
 async function createMySQLConnection(host, user, password) {
     const mysql = require('async-mysql');
     connM = await mysql.connect({
-        host: host,
+        host: process.env.DATABASE_HOST || '127.0.0.1',
         user: user,
         password: password,
         multipleStatements: true
@@ -229,7 +229,7 @@ async function getOneAnimal(id) {
 // Reading all animals of an environment
 async function getAllAnimals(id) {
     //const tableReading = 'SELECT animal.id, animal.name, animalType.type FROM animal JOIN animalType ON animal.animalType_id = animalType.id WHERE animal.environment_id = ' + id;
-    const tableReading = 'SELECT animal.id, animal.name, animal.animalType_id FROM animals WHERE animal.environment_id = ' + id;
+    const tableReading = 'SELECT animal.id, animal.name, animal.animalType_id FROM animal WHERE animal.environment_id = ' + id;
     return await connM.query(tableReading).catch((err) => {return err;});
 }
 
