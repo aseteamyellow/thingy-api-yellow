@@ -35,7 +35,7 @@ async function getSensorsData(thingyId) {
 }
 
 // Creation of MySQL connection + tables
-async function createMySQLConnection(host, user, password) {
+async function createMySQLConnection(user, password) {
     const mysql = require('async-mysql');
     connM = await mysql.connect({
         host: process.env.DATABASE_HOST || '127.0.0.1',
