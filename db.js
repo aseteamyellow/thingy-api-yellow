@@ -92,6 +92,11 @@ async function createMySQLConnection(user, password) {
             await connM.query(animalTypeTableInsertion).catch((err) => console.log(err));
         }
     }
+
+    // keep-alive mysql connection
+    setInterval(function () {
+        connM.query('SELECT 1;')
+    }, 5000);
 }
 
 // Insertion of testing data into MysQL tables
