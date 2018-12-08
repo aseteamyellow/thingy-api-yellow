@@ -7,16 +7,6 @@ const client = mqtt.connect('mqtt://mqtt.thing.zone:1896', {
 client.on('connect', function () {
     initSubscriptions().catch((err) => console.log(err));
 
-    // Configuration of led color
-    let buffer = new Buffer(4);
-    buffer.writeUInt8(1, 0);
-    buffer.writeUInt8(255,1);
-    buffer.writeUInt8(0,2);
-    buffer.writeUInt8(0,3);
-    client.publish('ThingyY1/ef680300-9b35-4933-9b10-52ffa9740042/ef680301-9b35-4933-9b10-52ffa9740042/write', buffer, function(err) {
-        if (err) console.log(err);
-    });
-
     // Configuration of sensors data capture intervals
     /*buffer = new Buffer(12);
     buffer.writeUInt16LE(1000,0);
@@ -32,33 +22,78 @@ client.on('connect', function () {
     });*/
 });
 
+const RED = [255,0,0];
+const GREEN = [0,255,0];
 let data = {};
 client.on('message', function (topic, message) {
     const thingyUUID = topic.split('/')[0];
     if (!data.hasOwnProperty(thingyUUID)) data[thingyUUID] = {};
     switch(message.length) {
-        case 1 : data[thingyUUID].humidity = message.readUInt8(0); break;
-        case 2 : data[thingyUUID].temperature = message.readInt8(0) + (message.readUInt8(1)/100); break;
+        case 1 : data[thingyUUID].humidity = message.readUInt8(0) / 100; break;
+        case 2 : data[thingyUUID].temperature = message.readInt8(0) + (message.readUInt8(1) / 100); break;
         case 4 : data[thingyUUID].air_quality = message.readUInt16LE(0); break;
         case 5 : data[thingyUUID].air_pressure = message.readInt32LE(0) + (message.readUInt8(4)/100); break;
         case 8 : data[thingyUUID].light = message.readUInt16LE(0) + message.readUInt16LE(2) + message.readUInt16LE(4) + message.readUInt16LE(6);   //It shouldn't be plus (red, green, blue, clear)
     }
+
     if (Object.keys(data[thingyUUID]).length === nbNotifs[thingyUUID]) {
+        color = GREEN;
+        for (key in data[thingyUUID]) {
+            if (thingysConfigs.hasOwnProperty(thingyUUID) && (
+                data[thingyUUID][key] < thingysConfigs[thingyUUID][key + '_min'] ||
+                data[thingyUUID][key] > thingysConfigs[thingyUUID][key + '_max'])) {
+                color = RED;
+                break;
+            }
+        }
+        setLedColor(thingyUUID,color);
+        //setSound(thingyUUID,[210,5000,50]);
         db.insertInfluxDB(thingyUUID, data[thingyUUID]).catch((err) => console.log(err));
         data[thingyUUID] = {};
     }
 });
 
+// Sets the led color of a thingy
+async function setLedColor(thingy, rgb) {
+    let buffer = new Buffer(4);
+    buffer.writeUInt8(1, 0);
+    buffer.writeUInt8(rgb[0],1);
+    buffer.writeUInt8(rgb[1],2);
+    buffer.writeUInt8(rgb[2],3);
+    client.publish(thingy + '/ef680300-9b35-4933-9b10-52ffa9740042/ef680301-9b35-4933-9b10-52ffa9740042/write', buffer, function(err) {
+        if (err) console.log(err);
+    });
+}
+
+// Turns on/off the sound of a thingy
+async function setSound(thingy,freDurVol) {
+    let buffer = new Buffer(2);
+    buffer.writeUInt8(1,0);
+    buffer.writeUInt8(2,1);
+    client.publish(thingy + 'ef680500-9b35-4933-9b10-52ffa9740042/ef680501-9b35-4933-9b10-52ffa9740042/write', buffer, function(err) {
+        if (err) console.log(err);
+    })
+    buffer = new Buffer(5);
+    buffer.writeUInt16LE(freDurVol[0],0);
+    buffer.writeUInt16LE(freDurVol[1],2);
+    buffer.writeUInt8(freDurVol[2],4);
+    client.publish(thingy + 'ef680500-9b35-4933-9b10-52ffa9740042/ef680502-9b35-4933-9b10-52ffa9740042/write', buffer, function(err) {
+        if (err) console.log(err);
+    })
+}
+
 const ts = require('./thingyServicesUUID');
 const db = require('./db');
 
+let thingysConfigs = {};
+
 // Subscribes to all topics at starting
 async function initSubscriptions() {
-    const subs = await db.getNotifs();
-    for (let i = 0; i < subs.length; i++) {
-        const thingy = subs[i].thingy; delete subs[i].thingy;
-        //await db.createTableInfluxDB(thingy).catch((err) => console.log(err));
-        await changeSubscriptions(thingy, subs[i]);
+    const configs = await db.getThingysConfigs();
+    for (let i = 0; i < configs.length; i++) {
+        const thingy = configs[i].thingy;
+        thingysConfigs[thingy] = {};
+        await changeSubscriptions(thingy, configs[i]);
     }
 }
 
@@ -74,6 +109,9 @@ async function changeSubscriptions(thingyUUID, topics) {
             const completeTopicUUID = thingyUUID + '/' + replaceCharAt(ts[topicUUID], 0, 7) + '/' + ts[topicUUID];
             if (topics[key] === 1 || topics[key]) topicsToSubscribe = topicsToSubscribe.concat([completeTopicUUID]);
             else topicsToUnsubscribe = topicsToUnsubscribe.concat([completeTopicUUID]);
+        } else if (key.endsWith('min') || key.endsWith('max')) {
+            if (!thingysConfigs.hasOwnProperty(thingyUUID)) thingysConfigs[thingyUUID] = {};
+            thingysConfigs[thingyUUID][key] = topics[key];
         }
     }
     if (topicsToSubscribe.length !== 0) client.subscribe(topicsToSubscribe, function(err) {
@@ -82,7 +120,8 @@ async function changeSubscriptions(thingyUUID, topics) {
     if (topicsToUnsubscribe.length !== 0) client.unsubscribe(topicsToUnsubscribe, function(err) {
         if (err) console.log(err);
     });
-    nbNotifs[thingyUUID] = topicsToSubscribe.length;
+    if (!nbNotifs.hasOwnProperty(thingyUUID)) nbNotifs[thingyUUID] = topicsToSubscribe.length;
+    else nbNotifs[thingyUUID] = nbNotifs[thingyUUID] + topicsToSubscribe.length - topicsToUnsubscribe.length;
 }
 
 // Unsubscribes to all topics of a thingy
@@ -91,6 +130,7 @@ async function deleteAllSubscriptions(thingyUUID) {
         if (err) console.log(err);
     });
     nbNotifs[thingyUUID] = 0;
+    thingysConfigs = {};
 }
 
 // Replace the a character of a string at a specific index

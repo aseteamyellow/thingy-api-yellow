@@ -4,7 +4,8 @@ let connM = null;
 // Creation of InfluxDB connection
 async function createInfluxDBConnection(port) {
     const influx = require('influxdb-nodejs');
-    connI = new influx('http://influxdb:' + port + '/thingy');
+    //connI = new influx('http://influxdb:' + port + '/thingy');    // Used for docker
+    connI = new influx('http://127.0.0.1:' + port + '/thingy');     // Used locally
     connI.createDatabase().catch((err) => console.log(err));
 }
 
@@ -48,7 +49,8 @@ async function createMySQLConnection(user, password) {
     const userTableCreation =           'CREATE TABLE IF NOT EXISTS user (' +
                                         'id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,' +
                                         'email VARCHAR(100) UNIQUE NOT NULL,' +
-                                        'password VARCHAR(100) NOT NULL);';
+                                        'password VARCHAR(100) NOT NULL,' +
+                                        'firebase_token VARCHAR(100) NOT NULL);';
     const environmentTableCreation =    'CREATE TABLE IF NOT EXISTS environment (' +
                                         'id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,' +
                                         'user_id INT UNSIGNED NOT NULL,' +
@@ -112,13 +114,13 @@ function base64_img(file) {
 async function insertTestingDataInMySQLTables() {
     const deleteAllTablesContent = "DELETE FROM animal; DELETE FROM environment; DELETE FROM user;";
     const resetAllIncrements = "ALTER TABLE animal AUTO_INCREMENT = 1; ALTER TABLE environment AUTO_INCREMENT = 1; ALTER TABLE user AUTO_INCREMENT = 1;";
-    const insertUsers = "INSERT INTO user VALUES (NULL,'nicolas.fuchs@unifr.ch','PasswordOfNicolas')," +
-                                                "(NULL,'sylvain.julmy@unifr.ch','PasswordOfSylvain')," +
-                                                "(NULL,'delia.favre@unifr.ch','PasswordOfDelia')," +
-                                                "(NULL,'maeva.vulliens@unifr.ch','PasswordOfMaeva')," +
-                                                "(NULL,'tania.chenaux@unifr.ch','PasswordOfTania');";
-    const insertEnvironments = "INSERT INTO environment VALUES (NULL,'1','NicoAquarium','" + base64_img('environment1') + "','aquarium','0.77','0.79','37','39','149','151','1010','1015','0','255255255',true,true,true,true,true,'172.22.22.192:8080','ThingyY1')," +
-                                                              "(NULL,'3','DeliaTerrarium','" + base64_img('environment1') + "','terrarium',NULL,NULL,'37','39','149','151','1010','1015',NULL,NULL,false,true,true,true,false,NULL,'Yellow');";
+    const insertUsers = "INSERT INTO user VALUES (NULL,'nicolas.fuchs@unifr.ch','PasswordOfNicolas','TokenOfNicolas')," +
+                                                "(NULL,'sylvain.julmy@unifr.ch','PasswordOfSylvain','TokenOfSylvain')," +
+                                                "(NULL,'delia.favre@unifr.ch','PasswordOfDelia','TokenOfDelia')," +
+                                                "(NULL,'maeva.vulliens@unifr.ch','PasswordOfMaeva','TokenOfMaeva')," +
+                                                "(NULL,'tania.chenaux@unifr.ch','PasswordOfTania','TokenOfTania');";
+    const insertEnvironments = "INSERT INTO environment VALUES (NULL,'1','NicoAquarium','" + base64_img('environment1') + "','aquarium','0.1','0.9','23','28','0','10000','924','926','0','255255255',true,true,true,true,true,'172.22.22.192:8080','ThingyY1')," +
+                                                              "(NULL,'3','DeliaTerrarium','" + base64_img('environment1') + "','terrarium',NULL,NULL,'23','28','0','5000','924','926',NULL,NULL,false,true,true,true,false,NULL,'Yellow');";
     const insertAnimals = "INSERT INTO animal VALUES (NULL,'riri',1,12)," +
                                                     "(NULL,'fifi',1,16)," +
                                                     "(NULL,'loulou',1,9)," +
@@ -177,8 +179,7 @@ async function insertMySQL(tableName, data) {
     }
     columns = columns.substring(0, columns.length-1);
     values = values.substring(0, values.length-1);
-    const tableInsertion =  'INSERT INTO ' + tableName + ' (' + columns + ') ' +
-                            'VALUES (' + values + ')';
+    const tableInsertion =  'INSERT INTO ' + tableName + ' (' + columns + ') ' + 'VALUES (' + values + ')';
     return await connM.query(tableInsertion).catch((err) => {return err;});
 }
 
@@ -188,6 +189,11 @@ async function updateMySQL(tableName, data, id) {
         if (data.hasOwnProperty('thingy')) {
             await deleteTableInfluxDB(data.thingy);
             await mqtt.deleteAllSubscriptions(data.thingy);
+        }
+        if (!data.hasOwnProperty('thingy')) {
+            const tableReading = 'SELECT thingy FROM environment WHERE id = ' + id;
+            const res = await connM.query(tableReading).catch((err) => {return err;});
+            data['thingy'] = res[0].thingy;
         }
         await mqtt.changeSubscriptions(data['thingy'], data);
     }
@@ -281,8 +287,17 @@ async function getAllEnvironments(id) {
 }
 
 // Reading all notification settings of all thingys
-async function getNotifs() {
+/*async function getNotifs() {
     const tableReading = 'SELECT thingy, humidity_notif, temperature_notif, air_quality_notif, air_pressure_notif, light_notif FROM environment';
+    return await connM.query(tableReading).catch((err) => {return err;});
+}*/
+
+// Reading configurations of all thingys
+async function getThingysConfigs() {
+    const tableReading = 'SELECT e.thingy, e.humidity_notif, e.temperature_notif, e.air_quality_notif, e.air_pressure_notif, e.light_notif,' +
+                         'e.humidity_min, e.humidity_max, e.temperature_min, e.temperature_max, e.air_quality_min, e.air_quality_max,' +
+                         'e.air_pressure_min, e.air_pressure_max, e.light_min, e.light_max, u.firebase_token FROM environment e JOIN user u ' +
+                         'ON e.user_id = u.id;';
     return await connM.query(tableReading).catch((err) => {return err;});
 }
 
@@ -306,4 +321,5 @@ module.exports.getAllUserAnimals = getAllUserAnimals;
 module.exports.getAllAnimalTypes = getAllAnimalTypes;
 module.exports.getOneEnvironment = getOneEnvironment;
 module.exports.getAllEnvironments = getAllEnvironments;
-module.exports.getNotifs = getNotifs;
+//module.exports.getNotifs = getNotifs;
+module.exports.getThingysConfigs = getThingysConfigs;
