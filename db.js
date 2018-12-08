@@ -4,7 +4,7 @@ let connM = null;
 // Creation of InfluxDB connection
 async function createInfluxDBConnection(port) {
     const influx = require('influxdb-nodejs');
-    connI = new influx('http://127.0.0.1:' + port + '/thingy');
+    connI = new influx('http://influxdb:' + port + '/thingy');
     connI.createDatabase().catch((err) => console.log(err));
 }
 
@@ -35,10 +35,10 @@ async function getSensorsData(thingyId) {
 }
 
 // Creation of MySQL connection + tables
-async function createMySQLConnection(host, user, password) {
+async function createMySQLConnection(user, password) {
     const mysql = require('async-mysql');
     connM = await mysql.connect({
-        host: host,
+        host: process.env.DATABASE_HOST || '127.0.0.1',
         user: user,
         password: password,
         multipleStatements: true
@@ -96,6 +96,11 @@ async function createMySQLConnection(host, user, password) {
             await connM.query(animalTypeTableInsertion).catch((err) => console.log(err));
         }
     }
+
+    // keep-alive mysql connection
+    setInterval(function () {
+        connM.query('SELECT 1;')
+    }, 5000);
 }
 
 const fs = require('fs');
@@ -265,7 +270,7 @@ async function getOneEnvironment(id) {
     }
 }
 
-// Reading all environment of a user
+// Reading all environments of a user
 async function getAllEnvironments(id) {
     const tableReading = 'SELECT * FROM environment WHERE user_id = ' + id;
     const res = await connM.query(tableReading).catch((err) => {return err;});
