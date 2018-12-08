@@ -1,6 +1,7 @@
 const router = require('koa-router')({ prefix: '/animal' });
 
 router
+    .get('/allOfUser/:userId', getAllAnimalsOfUser)
     .get('/all/:envId', getAllAnimals)
     .get('/one/:animalId', getOneAnimal)
     .post('/:envId', createAnimal)
@@ -8,6 +9,18 @@ router
     .delete('/:animalId', deleteAnimal);
 
 const db = require('../db');
+
+// Reads all animals of a user
+async function getAllAnimalsOfUser(ctx) {
+    const res = await db.getAllUserAnimals(ctx.params.userId);
+    if (res.hasOwnProperty('message') && res.message.startsWith('Error')) {
+        ctx.status = 400;
+        ctx.body = res.message;
+    } else {
+        ctx.status = 200;
+        ctx.body = res;
+    }
+}
 
 // Reads all animals of an environment
 async function getAllAnimals(ctx) {

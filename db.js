@@ -53,6 +53,7 @@ async function createMySQLConnection(host, user, password) {
                                         'id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,' +
                                         'user_id INT UNSIGNED NOT NULL,' +
                                         'name VARCHAR(100) NOT NULL,' +
+                                        'icon LONGTEXT NOT NULL,' +
                                         'env_type ENUM(\'terrarium\', \'aquarium\', \'aquaterrarium\') NOT NULL,' +
                                         'humidity_min DECIMAL(15,5),' +
                                         'humidity_max DECIMAL(15,5),' +
@@ -74,7 +75,8 @@ async function createMySQLConnection(host, user, password) {
                                         'FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE ON UPDATE CASCADE);';
     const animalTypeTableCreation =     'CREATE TABLE IF NOT EXISTS animalType (' +
                                         'id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,' +
-                                        'type VARCHAR(100) UNIQUE NOT NULL);';
+                                        'type VARCHAR(100) UNIQUE NOT NULL,' +
+                                        'icon LONGTEXT NOT NULL);';
     const animalTableCreation =         'CREATE TABLE IF NOT EXISTS animal (' +
                                         'id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,' +
                                         'name VARCHAR(100) NOT NULL,' +
@@ -83,15 +85,22 @@ async function createMySQLConnection(host, user, password) {
                                         'FOREIGN KEY (environment_id) REFERENCES environment(id) ON DELETE CASCADE ON UPDATE CASCADE,' +
                                         'FOREIGN KEY (animalType_id) REFERENCES animalType(id) ON DELETE CASCADE ON UPDATE CASCADE);';
     await connM.query(userTableCreation + environmentTableCreation + animalTypeTableCreation + animalTableCreation).catch((err) => console.log(err));
-    const animalTypes = ['dog','cat','hamster','indian pig','bunny','rat','snake','lizard','iguana','turtle','triton','salamander','chameleon','spider','fish','insects','parrot','other'];
+    const animalTypes = ['dog','cat','indian pig','bunny','rat','snake','lizard','iguana','turtle','chameleon','spider',
+                         'fish','insects','parrot','bird','frog','scorpion','ferret','crocodile','sea horse','squirrel',
+                         'butterfly','octopus','snail','other'];
     const animalTypeSelection = 'SELECT * FROM animalType;';
     const animalTypeContent = await connM.query(animalTypeSelection).catch((err) => console.log(err));
     if (animalTypeContent.length === 0) {
         for (let i = 0; i < animalTypes.length; i++) {
-            const animalTypeTableInsertion = "INSERT INTO animalType (type) VALUES ('" + animalTypes[i] + "');";
+            const animalTypeTableInsertion = "INSERT INTO animalType VALUES (NULL,'" + animalTypes[i] + "','" + base64_img(animalTypes[i].replace(/\s/g,'')) + "');";
             await connM.query(animalTypeTableInsertion).catch((err) => console.log(err));
         }
     }
+}
+
+const fs = require('fs');
+function base64_img(file) {
+    return 'data:image/png;base64,' + new Buffer(fs.readFileSync('images/icon_' + file + '.png')).toString('base64');
 }
 
 // Insertion of testing data into MysQL tables
@@ -103,13 +112,13 @@ async function insertTestingDataInMySQLTables() {
                                                 "(NULL,'delia.favre@unifr.ch','PasswordOfDelia')," +
                                                 "(NULL,'maeva.vulliens@unifr.ch','PasswordOfMaeva')," +
                                                 "(NULL,'tania.chenaux@unifr.ch','PasswordOfTania');";
-    const insertEnvironments = "INSERT INTO environment VALUES (NULL,'1','NicoAquarium','aquarium','0.77','0.79','37','39','149','151','1010','1015','0','255255255',true,true,true,true,true,'172.22.22.192:8080','ThingyY1')," +
-                                                              "(NULL,'3','DeliaTerrarium','terrarium',NULL,NULL,'37','39','149','151','1010','1015',NULL,NULL,false,true,true,true,false,NULL,'Yellow');";
-    const insertAnimals = "INSERT INTO animal VALUES (NULL,'riri',1,15)," +
-                                                    "(NULL,'fifi',1,11)," +
-                                                    "(NULL,'loulou',1,10)," +
-                                                    "(NULL,'donut',2,3)," +
-                                                    "(NULL,'capsule',2,5);";
+    const insertEnvironments = "INSERT INTO environment VALUES (NULL,'1','NicoAquarium','" + base64_img('environment1') + "','aquarium','0.77','0.79','37','39','149','151','1010','1015','0','255255255',true,true,true,true,true,'172.22.22.192:8080','ThingyY1')," +
+                                                              "(NULL,'3','DeliaTerrarium','" + base64_img('environment1') + "','terrarium',NULL,NULL,'37','39','149','151','1010','1015',NULL,NULL,false,true,true,true,false,NULL,'Yellow');";
+    const insertAnimals = "INSERT INTO animal VALUES (NULL,'riri',1,12)," +
+                                                    "(NULL,'fifi',1,16)," +
+                                                    "(NULL,'loulou',1,9)," +
+                                                    "(NULL,'donut',2,5)," +
+                                                    "(NULL,'capsule',2,4);";
     connM.query(deleteAllTablesContent + resetAllIncrements + insertUsers + insertEnvironments + insertAnimals).catch((err) => console.log(err));
 }
 
@@ -216,7 +225,6 @@ async function getOneUser(credentials) {
 
 // Reading of an animal
 async function getOneAnimal(id) {
-    //const tableReading = 'SELECT animal.id, animal.name, animal.environment_id, animalType.type FROM animal JOIN animalType ON animal.animalType_id = animalType.id WHERE animal.id = ' + id;
     const tableReading = 'SELECT * FROM animal WHERE animal.id = ' + id;
     const res = await connM.query(tableReading).catch((err) => {return err;});
     if (res.length !== 0) {
@@ -228,8 +236,13 @@ async function getOneAnimal(id) {
 
 // Reading all animals of an environment
 async function getAllAnimals(id) {
-    //const tableReading = 'SELECT animal.id, animal.name, animalType.type FROM animal JOIN animalType ON animal.animalType_id = animalType.id WHERE animal.environment_id = ' + id;
-    const tableReading = 'SELECT animal.id, animal.name, animal.animalType_id FROM animals WHERE animal.environment_id = ' + id;
+    const tableReading = 'SELECT animal.id, animal.name, animal.animalType_id FROM animal WHERE animal.environment_id = ' + id;
+    return await connM.query(tableReading).catch((err) => {return err;});
+}
+
+// Reading all animals of a user
+async function getAllUserAnimals(id) {
+    const tableReading = 'SELECT animal.id, animal.name, animal.animalType_id FROM animal JOIN environment ON animal.environment_id = environment.id WHERE environment.user_id = ' + id;
     return await connM.query(tableReading).catch((err) => {return err;});
 }
 
@@ -284,6 +297,7 @@ module.exports.deleteMySQL = deleteMySQL;
 module.exports.getOneUser = getOneUser;
 module.exports.getOneAnimal = getOneAnimal;
 module.exports.getAllAnimals = getAllAnimals;
+module.exports.getAllUserAnimals = getAllUserAnimals;
 module.exports.getAllAnimalTypes = getAllAnimalTypes;
 module.exports.getOneEnvironment = getOneEnvironment;
 module.exports.getAllEnvironments = getAllEnvironments;
