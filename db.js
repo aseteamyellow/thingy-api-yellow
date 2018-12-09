@@ -94,19 +94,23 @@ async function createMySQLConnection(user, password) {
     const animalTypeContent = await connM.query(animalTypeSelection).catch((err) => console.log(err));
     if (animalTypeContent.length === 0) {
         for (let i = 0; i < animalTypes.length; i++) {
-            const animalTypeTableInsertion = "INSERT INTO animalType VALUES (NULL,'" + animalTypes[i] + "','" + base64_img(animalTypes[i].replace(/\s/g,'')) + "');";
+            const animalTypeTableInsertion = "INSERT INTO animalType VALUES (NULL,'" + animalTypes[i] + "','" + await base64_img(animalTypes[i].replace(/\s/g,'')) + "');";
             await connM.query(animalTypeTableInsertion).catch((err) => console.log(err));
         }
     }
 
-    // keep-alive mysql connection
+    // JSON body Creation of an environment
+    // {"name":"MaevaAquaterrarium","env_type":"aquaterrarium","thingy":"ThingyY1"}
+
+    // Keep-alive mysql connection
     setInterval(function () {
         connM.query('SELECT 1;')
     }, 5000);
 }
 
+// Converts an image according to its name to base64
 const fs = require('fs');
-function base64_img(file) {
+async function base64_img(file) {
     return 'data:image/png;base64,' + new Buffer(fs.readFileSync('images/icon_' + file + '.png')).toString('base64');
 }
 
@@ -119,8 +123,8 @@ async function insertTestingDataInMySQLTables() {
                                                 "(NULL,'delia.favre@unifr.ch','PasswordOfDelia','TokenOfDelia')," +
                                                 "(NULL,'maeva.vulliens@unifr.ch','PasswordOfMaeva','TokenOfMaeva')," +
                                                 "(NULL,'tania.chenaux@unifr.ch','PasswordOfTania','TokenOfTania');";
-    const insertEnvironments = "INSERT INTO environment VALUES (NULL,'1','NicoAquarium','" + base64_img('environment1') + "','aquarium','0.1','0.9','23','28','0','10000','924','926','0','255255255',true,true,true,true,true,'172.22.22.192:8080','ThingyY1')," +
-                                                              "(NULL,'3','DeliaTerrarium','" + base64_img('environment1') + "','terrarium',NULL,NULL,'23','28','0','5000','924','926',NULL,NULL,false,true,true,true,false,NULL,'Yellow');";
+    const insertEnvironments = "INSERT INTO environment VALUES (NULL,'1','NicoAquarium','" + await base64_img('environment1') + "','aquarium','0.1','0.9','23','28','0','10000','924','926','0','255255255',true,true,true,true,true,'172.22.22.192:8080','ThingyY1')," +
+                                                              "(NULL,'3','DeliaTerrarium','" + await base64_img('environment1') + "','terrarium',NULL,NULL,'23','28','0','5000','924','926',NULL,NULL,false,true,true,true,false,NULL,'Yellow');";
     const insertAnimals = "INSERT INTO animal VALUES (NULL,'riri',1,12)," +
                                                     "(NULL,'fifi',1,16)," +
                                                     "(NULL,'loulou',1,9)," +
@@ -168,6 +172,7 @@ async function insertMySQL(tableName, data) {
     if (tableName === 'environment') {
         await createTableInfluxDB(data['thingy']);
         await mqtt.changeSubscriptions(data['thingy'], data);
+        if (!data.hasOwnProperty('icon')) data['icon'] = await base64_img('environment1');
     }
     let columns = "";
     let values = "";
@@ -286,12 +291,6 @@ async function getAllEnvironments(id) {
     return res;
 }
 
-// Reading all notification settings of all thingys
-/*async function getNotifs() {
-    const tableReading = 'SELECT thingy, humidity_notif, temperature_notif, air_quality_notif, air_pressure_notif, light_notif FROM environment';
-    return await connM.query(tableReading).catch((err) => {return err;});
-}*/
-
 // Reading configurations of all thingys
 async function getThingysConfigs() {
     const tableReading = 'SELECT e.thingy, e.humidity_notif, e.temperature_notif, e.air_quality_notif, e.air_pressure_notif, e.light_notif,' +
@@ -321,5 +320,4 @@ module.exports.getAllUserAnimals = getAllUserAnimals;
 module.exports.getAllAnimalTypes = getAllAnimalTypes;
 module.exports.getOneEnvironment = getOneEnvironment;
 module.exports.getAllEnvironments = getAllEnvironments;
-//module.exports.getNotifs = getNotifs;
 module.exports.getThingysConfigs = getThingysConfigs;
