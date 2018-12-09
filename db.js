@@ -4,8 +4,8 @@ let connM = null;
 // Creation of InfluxDB connection
 async function createInfluxDBConnection(port) {
     const influx = require('influxdb-nodejs');
-    //connI = new influx('http://influxdb:' + port + '/thingy');    // Used for docker
-    connI = new influx('http://127.0.0.1:' + port + '/thingy');     // Used locally
+    // get the influxdb host from an env variable orElse localhost
+    connI = new influx( process.env.INFLUXDB_HOST || '127.0.0.1' + port + '/thingy');
     connI.createDatabase().catch((err) => console.log(err));
 }
 
