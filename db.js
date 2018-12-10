@@ -50,7 +50,7 @@ async function createMySQLConnection(user, password) {
                                         'id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,' +
                                         'email VARCHAR(100) UNIQUE NOT NULL,' +
                                         'password VARCHAR(100) NOT NULL,' +
-                                        'firebase_token VARCHAR(100) NOT NULL);';
+                                        'firebase_token VARCHAR(200) NOT NULL);';
     const environmentTableCreation =    'CREATE TABLE IF NOT EXISTS environment (' +
                                         'id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,' +
                                         'user_id INT UNSIGNED NOT NULL,' +
@@ -118,7 +118,7 @@ async function base64_img(file) {
 async function insertTestingDataInMySQLTables() {
     const deleteAllTablesContent = "DELETE FROM animal; DELETE FROM environment; DELETE FROM user;";
     const resetAllIncrements = "ALTER TABLE animal AUTO_INCREMENT = 1; ALTER TABLE environment AUTO_INCREMENT = 1; ALTER TABLE user AUTO_INCREMENT = 1;";
-    const insertUsers = "INSERT INTO user VALUES (NULL,'nicolas.fuchs@unifr.ch','PasswordOfNicolas','TokenOfNicolas')," +
+    const insertUsers = "INSERT INTO user VALUES (NULL,'nicolas.fuchs@unifr.ch','PasswordOfNicolas','eKBxItI5LL4:APA91bGLaLqovW7g6N-UJy1fuWmsOOHQ64hi3H7ysE93PovfyQnWFD2SoOY_NDl8nH5_iHvz-rbDg7S1qWVjE44rF26HBQM2KH66sCGyA_JFgLOm4kD75QP9utJwVDM4hvnfyYRjZ2On')," +
                                                 "(NULL,'sylvain.julmy@unifr.ch','PasswordOfSylvain','TokenOfSylvain')," +
                                                 "(NULL,'delia.favre@unifr.ch','PasswordOfDelia','TokenOfDelia')," +
                                                 "(NULL,'maeva.vulliens@unifr.ch','PasswordOfMaeva','TokenOfMaeva')," +
@@ -204,7 +204,9 @@ async function updateMySQL(tableName, data, id) {
     }
     let tableModification = 'UPDATE ' + tableName + ' SET ';
     for (const key in data) {
-        if (data.hasOwnProperty(key)) tableModification += key + " = '" + data[key] + "',";
+        if (data.hasOwnProperty(key))
+            if (key.endsWith('notif')) tableModification += key + " = " + data[key] + ",";
+            else tableModification += key + " = '" + data[key] + "',";
     }
     tableModification = tableModification.substring(0, tableModification.length-1) + " WHERE id = " + id;
     return await connM.query(tableModification).catch((err) => {return err;});

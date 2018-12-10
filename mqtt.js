@@ -1,3 +1,7 @@
+const FCM = require('fcm-node');
+const serverKey = 'AAAAuouATXI:APA91bGwxBie0ilY65H7gN9yWgZQ5-DbeHOZzbG6ZOX_7WjaAE5cYTzAvvgevYxetVnLenQW6vedmc6xA2B8Icf2z1zqEGjT_kNBaxKBJ3yitOATGlu8RkCYJ2UOCJrpOikTHEvEBxJX';
+const fcm = new FCM(serverKey);
+
 const mqtt = require('mqtt');
 const client = mqtt.connect('mqtt://mqtt.thing.zone:1896', {
     username: 'yellow',
@@ -34,15 +38,30 @@ client.on('message', function (topic, message) {
         case 4 : data[thingyUUID].air_quality = message.readUInt16LE(0); break;
         case 5 : data[thingyUUID].air_pressure = message.readInt32LE(0) + (message.readUInt8(4)/100); break;
         case 8 : data[thingyUUID].light = message.readUInt16LE(0) + message.readUInt16LE(2) + message.readUInt16LE(4) + message.readUInt16LE(6);   //It shouldn't be plus (red, green, blue, clear)
+                 //console.log(message.readUInt16LE(0) + ' ' + message.readUInt16LE(2) + ' ' + message.readUInt16LE(4)  + ' ' +  message.readUInt16LE(6));
     }
 
-    if (Object.keys(data[thingyUUID]).length === nbNotifs[thingyUUID]) {
+    if (Object.keys(data[thingyUUID]).length === thingysConfigs[thingyUUID]['nbNotifs']) {
         color = GREEN;
         for (key in data[thingyUUID]) {
             if (thingysConfigs.hasOwnProperty(thingyUUID) && (
                 data[thingyUUID][key] < thingysConfigs[thingyUUID][key + '_min'] ||
                 data[thingyUUID][key] > thingysConfigs[thingyUUID][key + '_max'])) {
                 color = RED;
+                const msg = {
+                    to: thingysConfigs[thingyUUID]['firebase_token'],
+                    notification: {
+                        title: 'Sensor Limit Reach',
+                        body: key + ' sensor has reach one of its limits'
+                    }
+                };
+                fcm.send(msg, function(err, response){
+                    if (err) {
+                        console.log("Something has gone wrong! " + err);
+                    } else {
+                        console.log("Notification sent successfully with response: " + response);
+                    }
+                });
                 break;
             }
         }
@@ -97,8 +116,6 @@ async function initSubscriptions() {
     }
 }
 
-let nbNotifs = {};
-
 // (Un)Subscribes to topics of a thingy
 async function changeSubscriptions(thingyUUID, topics) {
     let topicsToSubscribe = [];
@@ -109,7 +126,7 @@ async function changeSubscriptions(thingyUUID, topics) {
             const completeTopicUUID = thingyUUID + '/' + replaceCharAt(ts[topicUUID], 0, 7) + '/' + ts[topicUUID];
             if (topics[key] === 1 || topics[key]) topicsToSubscribe = topicsToSubscribe.concat([completeTopicUUID]);
             else topicsToUnsubscribe = topicsToUnsubscribe.concat([completeTopicUUID]);
-        } else if (key.endsWith('min') || key.endsWith('max')) {
+        } else if (key.endsWith('min') || key.endsWith('max') || key === 'firebase_token') {
             if (!thingysConfigs.hasOwnProperty(thingyUUID)) thingysConfigs[thingyUUID] = {};
             thingysConfigs[thingyUUID][key] = topics[key];
         }
@@ -120,8 +137,13 @@ async function changeSubscriptions(thingyUUID, topics) {
     if (topicsToUnsubscribe.length !== 0) client.unsubscribe(topicsToUnsubscribe, function(err) {
         if (err) console.log(err);
     });
-    if (!nbNotifs.hasOwnProperty(thingyUUID)) nbNotifs[thingyUUID] = topicsToSubscribe.length;
-    else nbNotifs[thingyUUID] = nbNotifs[thingyUUID] + topicsToSubscribe.length - topicsToUnsubscribe.length;
+    if (!thingysConfigs.hasOwnProperty(thingyUUID)) {
+        thingysConfigs[thingyUUID] = {}; thingysConfigs[thingyUUID]['nbNotifs'] = topicsToSubscribe.length;
+    } else {
+        if (!thingysConfigs[thingyUUID].hasOwnProperty('nbNotifs')) thingysConfigs[thingyUUID]['nbNotifs'] = 0;
+        thingysConfigs[thingyUUID]['nbNotifs'] += topicsToSubscribe.length;
+        thingysConfigs[thingyUUID]['nbNotifs'] -= topicsToUnsubscribe.length;
+    }
 }
 
 // Unsubscribes to all topics of a thingy
@@ -129,8 +151,7 @@ async function deleteAllSubscriptions(thingyUUID) {
     client.unsubscribe('thingyUUID/#', function(err) {
         if (err) console.log(err);
     });
-    nbNotifs[thingyUUID] = 0;
-    thingysConfigs = {};
+    delete thingysConfigs[thingyUUID];
 }
 
 // Replace the a character of a string at a specific index
