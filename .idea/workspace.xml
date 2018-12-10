@@ -2,9 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="ad6c253a-8cc1-4129-8a74-1f06bb9ccc6e" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/db.js" beforeDir="false" afterPath="$PROJECT_DIR$/db.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mqtt.js" beforeDir="false" afterPath="$PROJECT_DIR$/mqtt.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/webbluetooth-proxy-master/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/webbluetooth-proxy-master/index.html" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -36,9 +35,9 @@
       <usages-collector id="statistics.file.extensions.open">
         <counts>
           <entry key="411" value="1" />
-          <entry key="html" value="7" />
+          <entry key="html" value="5" />
           <entry key="http" value="1" />
-          <entry key="js" value="49" />
+          <entry key="js" value="46" />
           <entry key="json" value="1" />
           <entry key="psql" value="19" />
           <entry key="sql" value="1" />
@@ -47,16 +46,16 @@
       <usages-collector id="statistics.file.types.open">
         <counts>
           <entry key="DBN-SQL" value="20" />
-          <entry key="HTML" value="7" />
+          <entry key="HTML" value="5" />
           <entry key="JSON" value="1" />
-          <entry key="JavaScript" value="50" />
+          <entry key="JavaScript" value="47" />
           <entry key="Scratch" value="1" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="html" value="197" />
-          <entry key="js" value="31165" />
+          <entry key="html" value="169" />
+          <entry key="js" value="30142" />
           <entry key="sql" value="7" />
           <entry key="txt" value="29" />
         </counts>
@@ -64,8 +63,8 @@
       <usages-collector id="statistics.file.types.edit">
         <counts>
           <entry key="DBN-SQL" value="7" />
-          <entry key="HTML" value="197" />
-          <entry key="JavaScript" value="31165" />
+          <entry key="HTML" value="169" />
+          <entry key="JavaScript" value="30142" />
           <entry key="PLAIN_TEXT" value="29" />
         </counts>
       </usages-collector>
@@ -94,17 +93,17 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/routes/environment.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="782">
+            <state relative-caret-position="-138">
               <caret line="46" column="31" selection-start-line="46" selection-start-column="31" selection-end-line="46" selection-end-column="31" />
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/db.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-153">
-              <caret line="207" column="90" lean-forward="true" selection-start-line="207" selection-start-column="90" selection-end-line="207" selection-end-column="90" />
+            <state relative-caret-position="341">
+              <caret line="102" column="8" selection-start-line="102" selection-start-column="8" selection-end-line="102" selection-end-column="8" />
             </state>
           </provider>
         </entry>
@@ -118,20 +117,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/mqtt.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="170">
-              <caret line="43" column="90" selection-start-line="43" selection-start-column="90" selection-end-line="43" selection-end-column="90" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/webbluetooth-proxy-master/index.html">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="272">
-              <caret line="28" column="127" selection-start-line="28" selection-start-column="127" selection-end-line="28" selection-end-column="127" />
+            <state relative-caret-position="-896">
+              <caret line="43" column="84" selection-start-line="43" selection-start-column="84" selection-end-line="43" selection-end-column="84" />
             </state>
           </provider>
         </entry>
@@ -157,14 +147,13 @@
       <find>getNotifs</find>
       <find>ends</find>
       <find>base64_img</find>
-      <find>nbNotifs</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="dummy://restClient/response131.json" root0="SKIP_INSPECTION" />
+    <setting file="dummy://restClient/response109.json" root0="SKIP_INSPECTION" />
   </component>
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
@@ -175,6 +164,7 @@
         <option value="$PROJECT_DIR$/thingyServicesUUID.js" />
         <option value="$PROJECT_DIR$/routes/thingy.js" />
         <option value="$PROJECT_DIR$/routes/environment.js" />
+        <option value="$PROJECT_DIR$/webbluetooth-proxy-master/index.html" />
         <option value="$PROJECT_DIR$/webbluetooth-proxy-master/js/app.js" />
         <option value="$PROJECT_DIR$/camera_tester/camera.html" />
         <option value="$PROJECT_DIR$/index.js" />
@@ -182,9 +172,8 @@
         <option value="$PROJECT_DIR$/camera_tester/camera.js" />
         <option value="$PROJECT_DIR$/routes/animal.js" />
         <option value="$PROJECT_DIR$/images/icons.js" />
-        <option value="$PROJECT_DIR$/webbluetooth-proxy-master/index.html" />
-        <option value="$PROJECT_DIR$/db.js" />
         <option value="$PROJECT_DIR$/mqtt.js" />
+        <option value="$PROJECT_DIR$/db.js" />
       </list>
     </option>
   </component>
@@ -245,12 +234,17 @@
             <path>
               <item name="thingy-api-yellow" type="3d21c010:ScopeViewTreeModel$ProjectNode" />
               <item name="" type="442cc68d:ScopeViewTreeModel$RootNode" />
-              <item name="routes" type="9f88c78c:ScopeViewTreeModel$FileNode" />
+              <item name="camera_tester" type="9f88c78c:ScopeViewTreeModel$FileNode" />
             </path>
             <path>
               <item name="thingy-api-yellow" type="3d21c010:ScopeViewTreeModel$ProjectNode" />
               <item name="" type="442cc68d:ScopeViewTreeModel$RootNode" />
-              <item name="webbluetooth-proxy-master" type="9f88c78c:ScopeViewTreeModel$FileNode" />
+              <item name="images" type="9f88c78c:ScopeViewTreeModel$FileNode" />
+            </path>
+            <path>
+              <item name="thingy-api-yellow" type="3d21c010:ScopeViewTreeModel$ProjectNode" />
+              <item name="" type="442cc68d:ScopeViewTreeModel$RootNode" />
+              <item name="routes" type="9f88c78c:ScopeViewTreeModel$FileNode" />
             </path>
           </expand>
           <select />
@@ -271,81 +265,6 @@
   <component name="RestClientSettings">
     <option name="REQUEST_HISTORY">
       <list>
-        <RestClientRequest>
-          <option name="httpMethod" value="PATCH" />
-          <option name="urlBase" value="http://localhost:8080" />
-          <option name="urlPath" value="/environment/1" />
-          <option name="headers">
-            <list>
-              <KeyValuePair>
-                <option name="key" value="Accept" />
-                <option name="value" value="application/json" />
-              </KeyValuePair>
-              <KeyValuePair>
-                <option name="key" value="Cache-Control" />
-                <option name="value" value="no-cache" />
-              </KeyValuePair>
-              <KeyValuePair>
-                <option name="key" value="Content-Type" />
-                <option name="value" value="application/json" />
-              </KeyValuePair>
-            </list>
-          </option>
-          <option name="parametersEnabled" value="true" />
-          <option name="haveTextToSend" value="true" />
-          <option name="textToSend" value="{&quot;humidity_notif&quot;:false}" />
-          <option name="filesToSend" value="" />
-        </RestClientRequest>
-        <RestClientRequest>
-          <option name="httpMethod" value="PATCH" />
-          <option name="urlBase" value="http://localhost:8080" />
-          <option name="urlPath" value="/environment/1" />
-          <option name="headers">
-            <list>
-              <KeyValuePair>
-                <option name="key" value="Accept" />
-                <option name="value" value="application/json" />
-              </KeyValuePair>
-              <KeyValuePair>
-                <option name="key" value="Cache-Control" />
-                <option name="value" value="no-cache" />
-              </KeyValuePair>
-              <KeyValuePair>
-                <option name="key" value="Content-Type" />
-                <option name="value" value="application/json" />
-              </KeyValuePair>
-            </list>
-          </option>
-          <option name="parametersEnabled" value="true" />
-          <option name="haveTextToSend" value="true" />
-          <option name="textToSend" value="{&quot;humidity_notif&quot;:&quot;false&quot;}" />
-          <option name="filesToSend" value="" />
-        </RestClientRequest>
-        <RestClientRequest>
-          <option name="httpMethod" value="POST" />
-          <option name="urlBase" value="http://localhost:8080" />
-          <option name="urlPath" value="/environment/4" />
-          <option name="headers">
-            <list>
-              <KeyValuePair>
-                <option name="key" value="Accept" />
-                <option name="value" value="application/json" />
-              </KeyValuePair>
-              <KeyValuePair>
-                <option name="key" value="Cache-Control" />
-                <option name="value" value="no-cache" />
-              </KeyValuePair>
-              <KeyValuePair>
-                <option name="key" value="Content-Type" />
-                <option name="value" value="application/json" />
-              </KeyValuePair>
-            </list>
-          </option>
-          <option name="parametersEnabled" value="true" />
-          <option name="haveTextToSend" value="true" />
-          <option name="textToSend" value="{&quot;name&quot;:&quot;MaevaAquaterrarium&quot;,&quot;env_type&quot;:&quot;aquaterrarium&quot;,&quot;thingy&quot;:&quot;ThingyY1&quot;}" />
-          <option name="filesToSend" value="" />
-        </RestClientRequest>
         <RestClientRequest>
           <option name="httpMethod" value="GET" />
           <option name="urlBase" value="http://localhost:8080" />
@@ -1546,6 +1465,81 @@
           <option name="textToSend" value="{&quot;email&quot;:&quot;toto@hotmail.ch&quot;,&quot;password&quot;:&quot;totoPassword&quot;}" />
           <option name="filesToSend" value="" />
         </RestClientRequest>
+        <RestClientRequest>
+          <option name="httpMethod" value="DELETE" />
+          <option name="urlBase" value="http://localhost:8080" />
+          <option name="urlPath" value="/account/delete/1" />
+          <option name="headers">
+            <list>
+              <KeyValuePair>
+                <option name="key" value="Accept" />
+                <option name="value" value="application/json" />
+              </KeyValuePair>
+              <KeyValuePair>
+                <option name="key" value="Cache-Control" />
+                <option name="value" value="no-cache" />
+              </KeyValuePair>
+              <KeyValuePair>
+                <option name="key" value="Content-Type" />
+                <option name="value" value="application/json" />
+              </KeyValuePair>
+            </list>
+          </option>
+          <option name="parametersEnabled" value="true" />
+          <option name="haveTextToSend" value="true" />
+          <option name="textToSend" value="{&quot;email&quot;:&quot;titi@hotmail.ch&quot;,&quot;password&quot;:&quot;titiPassword&quot;}" />
+          <option name="filesToSend" value="" />
+        </RestClientRequest>
+        <RestClientRequest>
+          <option name="httpMethod" value="PATCH" />
+          <option name="urlBase" value="http://localhost:8080" />
+          <option name="urlPath" value="/account/update/1" />
+          <option name="headers">
+            <list>
+              <KeyValuePair>
+                <option name="key" value="Accept" />
+                <option name="value" value="application/json" />
+              </KeyValuePair>
+              <KeyValuePair>
+                <option name="key" value="Cache-Control" />
+                <option name="value" value="no-cache" />
+              </KeyValuePair>
+              <KeyValuePair>
+                <option name="key" value="Content-Type" />
+                <option name="value" value="application/json" />
+              </KeyValuePair>
+            </list>
+          </option>
+          <option name="parametersEnabled" value="true" />
+          <option name="haveTextToSend" value="true" />
+          <option name="textToSend" value="{&quot;email&quot;:&quot;titi@hotmail.ch&quot;,&quot;password&quot;:&quot;titiPassword&quot;}" />
+          <option name="filesToSend" value="" />
+        </RestClientRequest>
+        <RestClientRequest>
+          <option name="httpMethod" value="PATCH" />
+          <option name="urlBase" value="http://localhost:8080" />
+          <option name="urlPath" value="/account/update/1" />
+          <option name="headers">
+            <list>
+              <KeyValuePair>
+                <option name="key" value="Accept" />
+                <option name="value" value="application/json" />
+              </KeyValuePair>
+              <KeyValuePair>
+                <option name="key" value="Cache-Control" />
+                <option name="value" value="no-cache" />
+              </KeyValuePair>
+              <KeyValuePair>
+                <option name="key" value="Content-Type" />
+                <option name="value" value="application/json" />
+              </KeyValuePair>
+            </list>
+          </option>
+          <option name="parametersEnabled" value="true" />
+          <option name="haveTextToSend" value="true" />
+          <option name="textToSend" value="{&quot;email&quot;:&quot;titi@hotmail.ch&quot;,&quot;password&quot;:&quot;tataPassword&quot;}" />
+          <option name="filesToSend" value="" />
+        </RestClientRequest>
       </list>
     </option>
   </component>
@@ -1610,7 +1604,7 @@
       <workItem from="1543059126679" duration="24308000" />
       <workItem from="1543951530149" duration="462000" />
       <workItem from="1544121043032" duration="2164000" />
-      <workItem from="1544128272766" duration="52440000" />
+      <workItem from="1544128272766" duration="37081000" />
     </task>
     <task id="LOCAL-00001" summary="Database update">
       <created>1541334335398</created>
@@ -1630,10 +1624,10 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="211704000" />
+    <option name="totallyTimeSpent" value="196345000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1936" height="1056" extended-state="7" />
+    <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
     <editor active="true" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.17017913" />
@@ -1643,8 +1637,8 @@
       <window_info id="DB Browser" order="4" weight="0.13540569" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.49947312" visible="true" weight="0.29577464" />
-      <window_info anchor="bottom" id="Debug" order="3" weight="0.44420367" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49947312" weight="0.33802816" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.3618635" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
@@ -1653,7 +1647,7 @@
       <window_info anchor="bottom" id="Event Log" order="9" sideWeight="0.50052685" side_tool="true" weight="0.32827735" />
       <window_info anchor="bottom" id="Terminal" order="10" weight="0.21018419" />
       <window_info anchor="bottom" id="DB Execution Console" order="11" />
-      <window_info anchor="bottom" id="REST Client" order="12" weight="0.35427952" />
+      <window_info active="true" anchor="bottom" id="REST Client" order="12" visible="true" weight="0.37594798" />
       <window_info anchor="bottom" id="Messages" order="13" weight="0.32936078" />
       <window_info anchor="right" id="Commander" order="0" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
@@ -1812,6 +1806,13 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/webbluetooth-proxy-master/index.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="476">
+          <caret line="28" column="94" lean-forward="true" selection-start-line="28" selection-start-column="94" selection-end-line="28" selection-end-column="94" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/thingyServicesUUID.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="119">
@@ -1833,6 +1834,13 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/mqtt.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-896">
+          <caret line="43" column="84" selection-start-line="43" selection-start-column="84" selection-end-line="43" selection-end-column="84" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/routes/animalType.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="323">
@@ -1847,31 +1855,17 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/webbluetooth-proxy-master/index.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="272">
-          <caret line="28" column="127" selection-start-line="28" selection-start-column="127" selection-end-line="28" selection-end-column="127" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/routes/environment.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="782">
+        <state relative-caret-position="-138">
           <caret line="46" column="31" selection-start-line="46" selection-start-column="31" selection-end-line="46" selection-end-column="31" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/db.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-153">
-          <caret line="207" column="90" lean-forward="true" selection-start-line="207" selection-start-column="90" selection-end-line="207" selection-end-column="90" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/mqtt.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="170">
-          <caret line="43" column="90" selection-start-line="43" selection-start-column="90" selection-end-line="43" selection-end-column="90" />
+        <state relative-caret-position="341">
+          <caret line="102" column="8" selection-start-line="102" selection-start-column="8" selection-end-line="102" selection-end-column="8" />
         </state>
       </provider>
     </entry>
