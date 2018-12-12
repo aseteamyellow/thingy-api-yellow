@@ -8,7 +8,6 @@ const animal = require('./routes/animal');
 const account = require('./routes/account');
 const environment = require('./routes/environment');
 const db = require('./db');
-const mqtt = require('./mqtt');
 
 db.createInfluxDBConnection(8086);
 db.createMySQLConnection('root','')

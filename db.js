@@ -5,7 +5,8 @@ let connM = null;
 async function createInfluxDBConnection(port) {
     const influx = require('influxdb-nodejs');
     // get the influxdb host from an env variable orElse localhost
-    connI = new influx( process.env.INFLUXDB_HOST || '127.0.0.1' + port + '/thingy');
+    const host = process.env.INFLUXDB_HOST || '127.0.0.1';
+    connI = new influx('http://' + host + ":" + port + '/thingy');
     connI.createDatabase().catch((err) => console.log(err));
 }
 
@@ -44,6 +45,7 @@ async function createMySQLConnection(user, password) {
         password: password,
         multipleStatements: true
     }).catch((err) => console.log(err));
+    console.log("connM : " + connM);
     await connM.query('CREATE DATABASE IF NOT EXISTS Thingy_Yellow').catch((err) => console.log(err));
     await connM.query('USE Thingy_Yellow; SET sql_mode = \'STRICT_ALL_TABLES\';').catch((err) => console.log(err));
     const userTableCreation =           'CREATE TABLE IF NOT EXISTS user (' +
