@@ -138,12 +138,13 @@ async function changeSubscriptions(thingyUUID, topics) {
         if (err) console.log(err);
     });
     if (!thingysConfigs.hasOwnProperty(thingyUUID)) {
-        thingysConfigs[thingyUUID] = {}; thingysConfigs[thingyUUID]['nbNotifs'] = topicsToSubscribe.length;
-    } else {
+        thingysConfigs[thingyUUID] = {}; //thingysConfigs[thingyUUID]['nbNotifs'] = topicsToSubscribe.length;
+    } /*else {
         if (!thingysConfigs[thingyUUID].hasOwnProperty('nbNotifs')) thingysConfigs[thingyUUID]['nbNotifs'] = 0;
         thingysConfigs[thingyUUID]['nbNotifs'] += topicsToSubscribe.length;
         thingysConfigs[thingyUUID]['nbNotifs'] -= topicsToUnsubscribe.length;
-    }
+    }*/
+    thingysConfigs[thingyUUID]['nbNotifs'] = topicsToSubscribe.length;  // Every time all notification settings (true and false ones) are received
 }
 
 // Unsubscribes to all topics of a thingy

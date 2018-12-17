@@ -5,8 +5,7 @@ let connM = null;
 async function createInfluxDBConnection(port) {
     const influx = require('influxdb-nodejs');
     // get the influxdb host from an env variable orElse localhost
-    const host = process.env.INFLUXDB_HOST || '127.0.0.1';
-    connI = new influx('http://' + host + ":" + port + '/thingy');
+    connI = new influx('http://' + (process.env.INFLUXDB_HOST || '127.0.0.1') + ':' + port + '/thingy');
     connI.createDatabase().catch((err) => console.log(err));
 }
 
@@ -52,7 +51,7 @@ async function createMySQLConnection(user, password) {
                                         'id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,' +
                                         'email VARCHAR(100) UNIQUE NOT NULL,' +
                                         'password VARCHAR(100) NOT NULL,' +
-                                        'firebase_token VARCHAR(200) NOT NULL);';
+                                        'firebase_token VARCHAR(200));';
     const environmentTableCreation =    'CREATE TABLE IF NOT EXISTS environment (' +
                                         'id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,' +
                                         'user_id INT UNSIGNED NOT NULL,' +
@@ -100,9 +99,6 @@ async function createMySQLConnection(user, password) {
             await connM.query(animalTypeTableInsertion).catch((err) => console.log(err));
         }
     }
-
-    // JSON body Creation of an environment
-    // {"name":"MaevaAquaterrarium","env_type":"aquaterrarium","thingy":"ThingyY1"}
 
     // Keep-alive mysql connection
     setInterval(function () {
@@ -236,7 +232,6 @@ async function getOneUser(credentials) {
     const tableReading = "SELECT * FROM user WHERE email = '" + credentials.email + "' AND password = '" + credentials.password + "'";
     const res = await connM.query(tableReading).catch((err) => {return err;});
     if (res.length !== 0) {
-        res[0].token = "new token";
         return res[0];
     } else {
         return {message:"Error: ER_NO_ENTRY: user not found"};

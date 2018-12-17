@@ -22,6 +22,7 @@ async function register(ctx) {
 // Connects a user and returns a token
 async function connect(ctx) {
     const res = await db.getOneUser(ctx.request.body);
+    console.log(ctx.request.path);
     if (res.hasOwnProperty('message') && res.message.startsWith('Error')) {
         ctx.status = 400;
         ctx.body = res.message;

@@ -1,7 +1,6 @@
 const router = require('koa-router')({ prefix: '/animalType' });
 
-router
-    .get('/', getAllAnimalTypes);
+router.get('/', getAllAnimalTypes);
 
 const db = require('../db');
 

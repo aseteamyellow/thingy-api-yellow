@@ -18,6 +18,10 @@ app
     .use(bodyParser())
     .use(cors());
 
+
+//const jwt = require('./routes/jwt');
+//app.use(jwt.unless({ path: [__dirname + /\/account\/login/]}));
+
 app.use(animalType.routes());
 app.use(animalType.allowedMethods());
 app.use(animal.routes());
