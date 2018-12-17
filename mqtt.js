@@ -48,6 +48,7 @@ client.on('message', function (topic, message) {
                 data[thingyUUID][key] < thingysConfigs[thingyUUID][key + '_min'] ||
                 data[thingyUUID][key] > thingysConfigs[thingyUUID][key + '_max'])) {
                 color = RED;
+                console.log(thingysConfigs[thingyUUID]['firebase_token']);
                 const msg = {
                     to: thingysConfigs[thingyUUID]['firebase_token'],
                     notification: {

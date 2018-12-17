@@ -10,8 +10,8 @@ const environment = require('./routes/environment');
 const db = require('./db');
 
 db.createInfluxDBConnection(8086);
-db.createMySQLConnection('root','')
-    .then(db.insertTestingDataInMySQLTables);
+db.createMySQLConnection('root','');
+    //.then(db.insertTestingDataInMySQLTables);
     //.then(db.insertTestingDataInInfluxDBTables).catch((err) => console.log(err));
 
 app
